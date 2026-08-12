@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: mart_indicadores_diarios
+    description: "Indicadores econômicos diários em formato largo, pronto para dashboard"
+    columns:
+      - name: data_referencia
+        tests:
+          - not_null
+          - unique

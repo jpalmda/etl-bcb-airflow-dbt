@@ -1,0 +1,11 @@
+# Airflow
+logs/
+*.pyc
+__pycache__/
+
+# dbt
+target/
+dbt_packages/
+
+# Ambiente
+.env

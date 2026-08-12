@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_bcb_series
+    description: "Séries do BCB tipadas e prontas para consumo pelas camadas seguintes"
+    columns:
+      - name: serie_codigo
+        tests:
+          - not_null
+      - name: serie_nome
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['selic_diaria', 'ipca_mensal', 'dolar_comercial_venda']
+      - name: data_referencia
+        tests:
+          - not_null
+      - name: valor
+        tests:
+          - not_null

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: bcb_series
+        description: "Séries temporais brutas extraídas da API do Banco Central (SGS)"
+        columns:
+          - name: serie_codigo
+            tests:
+              - not_null
+          - name: data_referencia
+            tests:
+              - not_null
+          - name: valor
+            tests:
+              - not_null
