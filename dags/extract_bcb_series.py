@@ -16,10 +16,11 @@ import psycopg2
 import requests
 from airflow.decorators import dag, task
 from airflow.exceptions import AirflowFailException
+from airflow.operators.bash import BashOperator
 
 # Séries do SGS que queremos acompanhar: código -> nome amigável
 SERIES = {
-    11: "selic_diaria",
+    432: "selic_meta_anual",
     433: "ipca_mensal",
     1: "dolar_comercial_venda",
 }
@@ -76,9 +77,6 @@ def extract_bcb_series():
         )
         response = requests.get(url, timeout=30)
 
-        # A API do BCB retorna 404 (em vez de lista vazia) quando não há
-        # nenhum dado no período pedido. Isso é comum em séries de baixa
-        # frequência (ex: IPCA é mensal) numa janela incremental de 1-2 dias.
         if response.status_code == 404:
             return []
 
@@ -120,8 +118,6 @@ def extract_bcb_series():
                 "Nenhum registro foi carregado em nenhuma série. "
                 "Verifique se a API do BCB está disponível ou se o período consultado está correto."
             )
-
-    # Janela incremental: usa o intervalo de execução do Airflow (data_interval)
     data_inicial = "{{ data_interval_start.strftime('%d/%m/%Y') }}"
     data_final = "{{ data_interval_end.strftime('%d/%m/%Y') }}"
 
@@ -136,7 +132,19 @@ def extract_bcb_series():
         tabela_pronta >> registros
         linhas_carregadas.append(linhas)
 
-    check_data_quality(linhas_carregadas)
+    checagem = check_data_quality(linhas_carregadas)
+
+    dbt_run = BashOperator(
+        task_id="dbt_run",
+        bash_command="cd /opt/airflow/include/dbt_project && dbt run",
+    )
+
+    dbt_test = BashOperator(
+        task_id="dbt_test",
+        bash_command="cd /opt/airflow/include/dbt_project && dbt test",
+    )
+
+    checagem >> dbt_run >> dbt_test
 
 
 extract_bcb_series()

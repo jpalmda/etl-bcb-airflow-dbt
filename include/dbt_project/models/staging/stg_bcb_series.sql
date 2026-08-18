@@ -1,4 +1,3 @@
--- Camada staging: renomeia/tipa os dados brutos, sem lógica de negócio ainda
 select
     serie_codigo,
     serie_nome,

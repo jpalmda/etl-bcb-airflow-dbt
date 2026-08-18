@@ -11,7 +11,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['selic_diaria', 'ipca_mensal', 'dolar_comercial_venda']
+              values: ['selic_meta_anual', 'ipca_mensal', 'dolar_comercial_venda']
       - name: data_referencia
         tests:
           - not_null
